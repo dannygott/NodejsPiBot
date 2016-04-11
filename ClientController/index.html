@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+
+    <script>
+
+          var ws = new WebSocket("ws://192.168.1.11:8001/echo");
+
+
+         var haveEvents = 'ongamepadconnected' in window;
+         var controllers = {};
+
+         function connecthandler(e) {
+           addgamepad(e.gamepad);
+         }
+
+         function addgamepad(gamepad) {
+           controllers[gamepad.index] = gamepad;
+           console.log("added Gamepad");
+                      setInterval(function(){
+                        var lval = gamepad.axes[1]+1+gamepad.axes[0];
+                        var rval = gamepad.axes[1]+1-gamepad.axes[0];
+                        var leftmotor = (lval+1)*550;
+                        var ritemotor = (rval+1)*550;
+                        var motSerRite = Math.round(ritemotor);
+                        var motSerLeft = Math.round(leftmotor);
+                        console.log("left"+motSerLeft);
+                        console.log("Rite"+motSerRite);
+                        var abutton = gamepad.buttons[0].pressed;
+                        console.log(abutton);
+                        var continput = {
+                          "right": motSerRite,
+                          "left": motSerLeft,
+                          "abutton": abutton
+                        };
+                        continput = JSON.stringify(continput)
+                        ws.send(continput);
+                      }, 30);
+                    };
+
+
+
+         function disconnecthandler(e) {
+           removegamepad(e.gamepad);
+         }
+
+         function removegamepad(gamepad) {
+           delete controllers[gamepad.index];
+         }
+
+         function updateStatus() {
+           if (!haveEvents) {
+             scangamepads();
+           }
+           requestAnimationFrame(updateStatus);
+         }
+
+         function scangamepads() {
+           var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+           for (var i = 0; i < gamepads.length; i++) {
+             if (gamepads[i]) {
+               if (gamepads[i].index in controllers) {
+                 controllers[gamepads[i].index] = gamepads[i];
+               } else {
+                 addgamepad(gamepads[i]);
+               }
+             }
+           }
+         }
+
+
+         window.addEventListener("gamepadconnected", connecthandler);
+         window.addEventListener("gamepaddisconnected", disconnecthandler);
+
+         if (!haveEvents) {
+           setInterval(scangamepads, 30);
+         }
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+  </head>
+  <body>
+    <h1>Robot Remote</h1>.
+    <input id="someInput" type="text">
+ <input type="button" value="Send" onClick="doStuff()">
+  </body>
+</html>
