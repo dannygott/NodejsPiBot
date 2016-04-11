@@ -20,6 +20,8 @@
            controllers[gamepad.index] = gamepad;
            console.log("added Gamepad");
                       setInterval(function(){
+
+                        // Drive Code
                         var lval = gamepad.axes[1]+1+gamepad.axes[0];
                         var rval = gamepad.axes[1]+1-gamepad.axes[0];
                         var leftmotor = (lval+1)*550;
@@ -28,11 +30,32 @@
                         var motSerLeft = Math.round(leftmotor);
                         console.log("left"+motSerLeft);
                         console.log("Rite"+motSerRite);
+
+
+                        if (motSerLeft >= 1245 && motSerLeft <= 1245 ) {
+                          motSerLeft = 1245;
+
+                        };
+
+                        if (motSerRite >= 1245 && motSerRite <= 1245 ) {
+                          motSerRite = 1245;
+                        };
+
+                        //Function buttons
                         var abutton = gamepad.buttons[0].pressed;
                         console.log(abutton);
+
+                        //Camera Code
+                        var camx = gamepad.axes[2]*2
+                        var camy = gamepad.axes[3]*2
+
+
+                        //Object constructor
                         var continput = {
                           "right": motSerRite,
                           "left": motSerLeft,
+                          "camx": camx,
+                          "camy": camy,
                           "abutton": abutton
                         };
                         continput = JSON.stringify(continput)
